@@ -20,6 +20,9 @@ public class NoteReader : MonoBehaviour
     private int _currentPage;
     private bool _isOpen;
 
+    public GameObject nextButton;
+    public GameObject previousButton;
+
     private void Awake()
     {
         if (instance != null && instance != this)
@@ -84,6 +87,12 @@ public class NoteReader : MonoBehaviour
 
     private void UpdatePage()
     {
+        bool isPreviousButtonActive = (_currentPage == 0) ? false : true;
+        previousButton.SetActive(isPreviousButtonActive);
+        
+        bool isNextButtonActive = (_currentPage == _pages.Length-1) ? false : true;
+        nextButton.SetActive(isNextButtonActive);
+        
         pageText.text = _pages[_currentPage];
         pageCounterText.text = $"{_currentPage + 1} / {_pages.Length}";
     }
@@ -95,5 +104,10 @@ public class NoteReader : MonoBehaviour
         
         Cursor.visible = lockPlayer;
         Cursor.lockState = lockPlayer ? CursorLockMode.None : CursorLockMode.Locked;
+    }
+
+    public bool IsOpen()
+    {
+        return _isOpen;
     }
 }
