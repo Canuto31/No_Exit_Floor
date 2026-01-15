@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class Note : MonoBehaviour, IInteractable
 {
+    [TextArea(2, 5)]
+    public string noteTitle;
     [TextArea(5, 10)]
     public string[] pages;
 
@@ -14,7 +16,7 @@ public class Note : MonoBehaviour, IInteractable
         }
 
         ShowPagesInConsole();
-        NoteReader.instance.Open(pages);
+        NoteReader.instance.Open(pages, noteTitle);
     }
 
     private void ShowPagesInConsole()
