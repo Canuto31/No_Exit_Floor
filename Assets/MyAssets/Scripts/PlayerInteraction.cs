@@ -119,4 +119,20 @@ public class PlayerInteraction : MonoBehaviour
         
         FlashlightController.instance.Toggle();
     }
+
+    public void OnFire(InputAction.CallbackContext context)
+    {
+        if (!context.performed) return;
+
+        if (NoteReader.instance != null && NoteReader.instance.IsOpen()) return;
+
+        if (PlayerEquipment.instance == null) return;
+        
+        var pistol = PlayerEquipment.instance.pistolObject.GetComponent<PistolController>();
+
+        if (pistol != null && PlayerEquipment.instance.pistolObject.activeSelf)
+        {
+            pistol.Shoot();
+        }
+    }
 }
