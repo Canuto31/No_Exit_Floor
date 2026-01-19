@@ -109,4 +109,14 @@ public class PlayerInteraction : MonoBehaviour
 
         _currentInteractable?.Interact();
     }
+
+    public void OnToggleFlashlight(InputAction.CallbackContext context)
+    {
+        if (!context.performed) return;
+
+        if (FlashlightController.instance == null)
+            return;
+        
+        FlashlightController.instance.Toggle();
+    }
 }
