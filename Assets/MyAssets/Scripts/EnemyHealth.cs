@@ -6,9 +6,12 @@ public class EnemyHealth : MonoBehaviour, IDamageable
     public float maxHealth = 100f;
     private float _currentHealth;
 
-    private void Start()
+    private EnemyHitReaction _hitReaction;
+
+    private void Awake()
     {
         _currentHealth = maxHealth;
+        _hitReaction = GetComponent<EnemyHitReaction>();
     }
 
     public void TakeDamage(float damage)
@@ -16,7 +19,8 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         _currentHealth -= damage;
         Debug.Log($"💥 Enemy hit! HP: {_currentHealth}");
 
-        OnHit();
+        if (_hitReaction != null)
+            OnHit();
 
         if (_currentHealth <= 0)
             Die();
@@ -25,6 +29,8 @@ public class EnemyHealth : MonoBehaviour, IDamageable
     private void OnHit()
     {
         Debug.Log("😵 Enemy stagger");
+        _hitReaction.React();
+
     }
 
     private void Die()
