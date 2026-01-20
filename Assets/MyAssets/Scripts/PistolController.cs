@@ -13,6 +13,10 @@ public class PistolController : MonoBehaviour
     public ParticleSystem muzzleFlash;
     public AudioSource shootSound;
 
+    [Header("Impact FX")]
+    public GameObject bloodImpactPrefab;
+    public GameObject wallImpactPrefab;
+
     private float _nextFireTime;
     
     private void Awake()
@@ -26,11 +30,17 @@ public class PistolController : MonoBehaviour
     public void Shoot()
     {
         if (Time.time < _nextFireTime) return;
-        
         _nextFireTime = Time.time + fireRate;
+
+        if (muzzleFlash)
+        {
+            muzzleFlash.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            muzzleFlash.Play();
+            Invoke(nameof(StopMuzzleFlash), 0.05f);
+        }
         
         //FX
-        if (muzzleFlash) muzzleFlash.Play();
+        //if (muzzleFlash) muzzleFlash.Play();
         if (shootSound) shootSound.Play();
 
         Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
@@ -40,14 +50,32 @@ public class PistolController : MonoBehaviour
         {
             Debug.DrawRay(ray.origin, ray.direction * hit.distance, Color.red, 1f);
             
-            //Damage
-            var damageable = hit.collider.GetComponent<IDamageable>();
-            if (damageable != null)
+            Vector3 hitPoint = hit.point;
+            Quaternion hitRotation = Quaternion.LookRotation(hit.normal);
+
+            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Enemy"))
             {
-                damageable.TakeDamage(damage);
+                //Blood
+                hitPoint += hit.normal * 0.01f;
+                Instantiate(bloodImpactPrefab, hitPoint, hitRotation);
+                
+                var damageable = hit.collider.GetComponent<IDamageable>();
+                if (damageable != null)
+                {
+                    damageable.TakeDamage(damage);
+                }
             }
-            
-            //Impact FX
+            else
+            {
+                //Environment
+                Instantiate(wallImpactPrefab, hitPoint, hitRotation);
+            }
         }
+    }
+
+    private void StopMuzzleFlash()
+    {
+        if (muzzleFlash)
+            muzzleFlash.Stop(true, ParticleSystemStopBehavior.StopEmitting);
     }
 }
