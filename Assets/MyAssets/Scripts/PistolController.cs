@@ -14,7 +14,6 @@ public class PistolController : MonoBehaviour
     public AudioSource shootSound;
 
     [Header("Impact FX")]
-    public GameObject bloodImpactPrefab;
     public GameObject wallImpactPrefab;
 
     private float _nextFireTime;
@@ -51,24 +50,20 @@ public class PistolController : MonoBehaviour
             Debug.DrawRay(ray.origin, ray.direction * hit.distance, Color.red, 1f);
             
             Vector3 hitPoint = hit.point;
-            Quaternion hitRotation = Quaternion.LookRotation(hit.normal);
+            Vector3 hitNormal = hit.normal;
 
             if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Enemy"))
             {
-                //Blood
-                hitPoint += hit.normal * 0.01f;
-                Instantiate(bloodImpactPrefab, hitPoint, hitRotation);
-                
                 var damageable = hit.collider.GetComponent<IDamageable>();
                 if (damageable != null)
                 {
-                    damageable.TakeDamage(damage);
+                    damageable.TakeDamage(damage, hitPoint, hitNormal);
                 }
             }
             else
             {
                 //Environment
-                Instantiate(wallImpactPrefab, hitPoint, hitRotation);
+                Instantiate(wallImpactPrefab, hitPoint, Quaternion.LookRotation(hit.normal));
             }
         }
     }
