@@ -18,11 +18,20 @@ public class PistolController : MonoBehaviour
 
     private float _nextFireTime;
     
+    [Header("Muzzle Flash Light")]
+    public GameObject muzzleFlashLight;
+    
     private void Awake()
     {
         if (muzzleFlash != null)
         {
             muzzleFlash.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        }
+        
+        if (muzzleFlashLight != null)
+        {
+            muzzleFlashLight.SetActive(false);
+            //muzzleFlashLight.enabled = false;
         }
     }
 
@@ -35,12 +44,19 @@ public class PistolController : MonoBehaviour
         {
             muzzleFlash.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             muzzleFlash.Play();
+            
+            if (muzzleFlashLight != null)
+                muzzleFlashLight.SetActive(true);
+                //muzzleFlashLight.enabled = true;
+            
             Invoke(nameof(StopMuzzleFlash), 0.05f);
         }
         
         //FX
         //if (muzzleFlash) muzzleFlash.Play();
         if (shootSound) shootSound.Play();
+        
+        if (CameraShake.instance != null) CameraShake.instance.Shake(0.04f, 0.08f);
 
         Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
         RaycastHit hit;
@@ -72,5 +88,9 @@ public class PistolController : MonoBehaviour
     {
         if (muzzleFlash)
             muzzleFlash.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+        
+        if (muzzleFlashLight != null)
+            muzzleFlashLight.SetActive(false);
+            //muzzleFlashLight.enabled = false;
     }
 }

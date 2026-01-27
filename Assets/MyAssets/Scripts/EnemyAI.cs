@@ -17,22 +17,15 @@ public class EnemyAI : MonoBehaviour
     
     private Rigidbody _rb;
     private bool _playerDetected;
+    
+    private PlayerBreathingController _breathing;
+    private bool _wasPlayerDetected;
 
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
+        _breathing = PlayerBreathingController.instance;
     }
-
-    /*private void Update()
-    {
-        _playerDetected = CanSeePlayer();
-        
-        if (_playerDetected)
-        {
-            Debug.Log("👀 Player detected");
-            ChasePlayer();
-        }
-    }*/
     
     private void FixedUpdate()
     {
@@ -41,6 +34,17 @@ public class EnemyAI : MonoBehaviour
         float distance = Vector3.Distance(transform.position, player.position);
         
         _playerDetected = CanSeePlayer();
+        
+        if (_playerDetected && !_wasPlayerDetected)
+        {
+            PlayerBreathingController.instance.PlayStressedBreathing();
+        }
+        else if (!_playerDetected && _wasPlayerDetected)
+        {
+            PlayerBreathingController.instance.PlayCalmBreathing();
+        }
+
+        _wasPlayerDetected = _playerDetected;
 
         if (_playerDetected && distance > stopDistance)
         {
