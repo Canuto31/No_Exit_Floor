@@ -29,7 +29,11 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         if (currentState == EnemyState.Fog)
         {
             if (fogImpactPrefab)
-                Instantiate(fogImpactPrefab, hitPoint, hitRotation);
+            {
+                GameObject fogTemp = Instantiate(fogImpactPrefab, hitPoint, hitRotation);
+                fogTemp.transform.parent = transform;
+            }
+            
             
             return;
         }
