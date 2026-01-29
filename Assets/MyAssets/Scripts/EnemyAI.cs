@@ -20,11 +20,13 @@ public class EnemyAI : MonoBehaviour
     
     private PlayerBreathingController _breathing;
     private bool _wasPlayerDetected;
+    private PlayerFearShake _fearShake;
 
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
         _breathing = PlayerBreathingController.instance;
+        _fearShake = player.GetComponentInChildren<PlayerFearShake>();
     }
     
     private void FixedUpdate()
@@ -38,10 +40,12 @@ public class EnemyAI : MonoBehaviour
         if (_playerDetected && !_wasPlayerDetected)
         {
             PlayerBreathingController.instance.PlayStressedBreathing();
+            _fearShake?.SetFearShake(true);
         }
         else if (!_playerDetected && _wasPlayerDetected)
         {
             PlayerBreathingController.instance.PlayCalmBreathing();
+            _fearShake?.SetFearShake(false);
         }
 
         _wasPlayerDetected = _playerDetected;
