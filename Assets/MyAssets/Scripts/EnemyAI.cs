@@ -22,11 +22,15 @@ public class EnemyAI : MonoBehaviour
     private bool _wasPlayerDetected;
     private PlayerFearShake _fearShake;
 
+    private float _originalMoveSpeed;
+
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
         _breathing = PlayerBreathingController.instance;
         _fearShake = player.GetComponentInChildren<PlayerFearShake>();
+        
+        _originalMoveSpeed = moveSpeed;
     }
     
     private void FixedUpdate()
@@ -113,5 +117,10 @@ public class EnemyAI : MonoBehaviour
         // Línea frontal
         Gizmos.color = Color.blue;
         Gizmos.DrawLine(transform.position, transform.position + transform.forward * viewDistance);
+    }
+
+    public void SetVulnerableMovement(bool isVulnerable)
+    {
+        moveSpeed = isVulnerable ? _originalMoveSpeed * 0.5F : _originalMoveSpeed;
     }
 }

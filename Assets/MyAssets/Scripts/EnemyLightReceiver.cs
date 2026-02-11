@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.VFX;
 
 public class EnemyLightReceiver : MonoBehaviour
 {
@@ -18,10 +19,19 @@ public class EnemyLightReceiver : MonoBehaviour
     private FlashlightController _flashlight;
     private Transform _flashlightTransform;
 
+    private EnemyAI _enemyAI;
+    
+    [Header("VFX")]
+    [SerializeField] private VisualEffect vulnerabilityVFX;
+    private readonly string colorParam = "Smoke Color";
+
+    [SerializeField] private Color colorVulnerable;
+
     private void Awake()
     {
         _enemyHealth = GetComponent<EnemyHealth>();
         _flashlight = FlashlightController.instance;
+        _enemyAI = GetComponent<EnemyAI>();
     }
 
     private void Update()
@@ -80,7 +90,11 @@ public class EnemyLightReceiver : MonoBehaviour
         if (light == null)
             return false;
         
-        Vector3 directionToEnemy = (transform.position - light.transform.position);
+        //Vector3 directionToEnemy = (transform.position - light.transform.position);
+        Collider enemyCollider = GetComponent<Collider>();
+        Vector3 closestPoint = enemyCollider.ClosestPoint(light.transform.position);
+        
+        Vector3 directionToEnemy = closestPoint - light.transform.position;
         float distance = directionToEnemy.magnitude;
 
         if (distance > maxLightDistance)
@@ -99,6 +113,7 @@ public class EnemyLightReceiver : MonoBehaviour
                 return false;
         }
         
+        
         return true;
     }
 
@@ -108,12 +123,23 @@ public class EnemyLightReceiver : MonoBehaviour
         _vulnerableTimer = vulnerableDuration;
         _currentExposureTime = 0f;
         
+        _enemyAI?.SetVulnerableMovement(true);
+
+        if (vulnerabilityVFX == null) return;
+        
+        vulnerabilityVFX.SetVector4(colorParam, colorVulnerable);
+        
         Debug.Log("🔥 Enemy is now VULNERABLE");
     }
 
     private void ReturnToFog()
     {
         _enemyHealth.currentState = EnemyState.Fog;
+        
+        _enemyAI?.SetVulnerableMovement(false);
+        
+        vulnerabilityVFX.SetVector4(colorParam, Color.black);
+        
         Debug.Log("🌫 Enemy returned to FOG");
     }
     
